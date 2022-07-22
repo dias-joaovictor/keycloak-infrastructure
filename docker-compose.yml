@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.0.29
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak_user
+      MYSQL_PASSWORD: keycloak_password
+      MYSQL_ROOT_PASSWORD: root
+  keycloak:
+    image: quay.io/keycloak/keycloak:18.0.2
+    ports:
+      - 9090:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=localhost
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HOSTNAME_STRICT=false
+    entrypoint: ["/opt/keycloak/bin/kc.sh", 
+      "start --auto-build", 
+      "--db=mysql",
+      "--db-url=jdbc:mysql://mysql:3306/keycloak",
+      "--db-username=keycloak_user",
+      "--db-password=keycloak_password"]
+    depends_on:
+      - mysql
